@@ -54,45 +54,49 @@ private:
     int healing_;
 };
 
-// Non-owning: every registered object must outlive its use by Inventory.
 class Inventory {
 public:
     bool add(Item* item) {
-    if (item == nullptr) {
-        return false;
-    }
-    for (Item* existing : items_) {
-        if (existing == item) {
+        if (item == nullptr) {
             return false;
         }
+        for (Item* existing : items_) {
+            if (existing == item) {
+                return false;
+            }
+        }
+        items_.push_back(item);
+        return true;
     }
-    items_.push_back(item);
-    return true;
-}
+
     std::size_t size() const {
-    return items_.size();
-}
+        return items_.size();
+    }
+
     Item* at(std::size_t index) const {
         if (index >= items_.size()) {
             return nullptr;
         }
         return items_[index];
     }
+
     Item* find(const std::string& name) const {
-    for (Item* item : items_) {
-        if (item->name() == name) {
-            return item;
+        for (Item* item : items_) {
+            if (item->name() == name) {
+                return item;
+            }
         }
+        return nullptr;
     }
-    return nullptr;
-}
+
     bool remove(std::size_t index) {
-    if (index >= items_.size()) {
-        return false;
+        if (index >= items_.size()) {
+            return false;
+        }
+        items_.erase(items_.begin() + index);
+        return true;
     }
-    items_.erase(items_.begin() + index);
-    return true;
-}
+
     std::vector<std::string> useAll() {
         std::vector<std::string> messages;
         for (Item* item : items_) {
@@ -100,9 +104,11 @@ public:
         }
         return messages;
     }
+
     void clear() {
-    items_.clear();
-}
+        items_.clear();
+    }
+
 private:
     std::vector<Item*> items_;
 };
